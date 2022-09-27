@@ -18,9 +18,6 @@ from flask_migrate import Migrate
 import sys
 from datetime import datetime, date
 
-# Reference on getting current date (link below)
-# https://www.programiz.com/python-programming/datetime/current-datetime#:~:text=today()%20method%20to%20get,representing%20date%20in%20different%20formats.
-
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -31,8 +28,6 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
-
-# TODO: connect to a local postgresql database
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -49,8 +44,6 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
- 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
     
     genres = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
@@ -61,8 +54,7 @@ class Venue(db.Model):
 
     def __repr__(self):
       return f'<Venue {self.id} {self.name} {self.city} {self.state}>'
-    
-    #Referenced videos within the Udacity Nanodegree program on __repr__ method
+
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -76,8 +68,6 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
     website_link = db.Column(db.String(120))
     looking_for_venues = db.Column(db.String(120))
     seeking_description = db.Column(db.String(500))
@@ -86,11 +76,7 @@ class Artist(db.Model):
 
     def __repr__(self):
       return f'<Artist {self.id} {self.name} {self.city} {self.state}>'
-    
-    #Referenced videos within the Udacity Nanodegree program on __repr__ method
 
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 class Show(db.Model):
     __tablename__ = 'Show'
@@ -103,7 +89,6 @@ class Show(db.Model):
     def __repr__(self):
       return f'<Show {self.id} {self.artist_id} {self.venue_id} {self.start_time}>'
     
-    #Referenced videos within the Udacity Nanodegree program on __repr__ method
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -133,8 +118,6 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   
   data=[]
 
@@ -154,9 +137,6 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
-  # seach for Hop should return "The Musical Hop".
-  # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   
   response=[]
   data=[]
@@ -164,7 +144,7 @@ def search_venues():
   search_term=request.form.get('search_term', '')
   
   venues = db.session.query(Venue).filter(Venue.name.ilike('%' + search_term + '%')).all()
-  #referenced clc80 on github on how to filter search results
+ 
 
   for venue in venues:
     data.append ({
@@ -183,12 +163,7 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
   
-  # Note: Referenced link below for TypeError associated with start_time and datetime.now()
-  #https://stackoverflow.com/questions/63269150/typeerror-parser-must-be-a-string-or-character-stream-not-datetime
-
   data=[]
   upcoming_shows=[]
   past_shows=[]
@@ -244,8 +219,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
   
   error = False
 
@@ -269,9 +242,6 @@ def create_venue_submission():
   # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   
   except:
     error = True
@@ -286,11 +256,6 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>/delete', methods=['GET']) 
 def delete_venue(venue_id):
-  # Note to self: added the /delete after the id
-  # DELETE method wasn't working, GET worked instead
-
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
   error = False
 
@@ -309,17 +274,12 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
 
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-
-  # Added the button on the show_venue.html
   return redirect(url_for('index'))
 
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # TODO: replace with real data returned from querying the database
   
   data=[]
 
@@ -335,9 +295,6 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-  # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
-  # search for "band" should return "The Wild Sax Band".
   
   response=[]
   data=[]
@@ -372,8 +329,6 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the artist page with the given artist_id
-  # TODO: replace with real artist data from the artist table, using artist_id
   
   data=[]
   upcoming_shows=[]
@@ -444,13 +399,11 @@ def edit_artist(artist_id):
   #  "image_link": artist.image_link
   #}
   
-  # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+  
   artist = db.session.query(Artist)
 
   error = False
@@ -473,8 +426,7 @@ def edit_artist_submission(artist_id):
     db.session.commit()
   # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully updated!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  
   
   except:
     error = True
@@ -513,8 +465,7 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
+  
   venue = db.session.query(Venue)
 
   error = False
@@ -539,9 +490,6 @@ def edit_venue_submission(venue_id):
   # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully updated!')
   
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   
   except:
     error = True
@@ -563,9 +511,6 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
 
   error = False
 
@@ -587,8 +532,6 @@ def create_artist_submission():
     db.session.commit()
   # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
   
   except:
     error = True
@@ -607,8 +550,6 @@ def create_artist_submission():
 
 @app.route('/shows')
 def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
   
   data=[]
   
@@ -634,9 +575,7 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
-
+  
   error = False
 
   try:
@@ -650,9 +589,6 @@ def create_show_submission():
     db.session.commit()
     # on successful db insert, flash success
     flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   
   except:
     error = True
